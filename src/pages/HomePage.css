@@ -1,0 +1,308 @@
+/* Garante que o overlay possa posicionar-se dentro de cada item */
+.carousel-item-relative {
+  position: relative;
+}
+
+/* Overlay por cima da imagem */
+.carousel-darken {
+  position: absolute;
+  inset: 0; /* top:0; right:0; bottom:0; left:0 */
+  background: rgba(0, 0, 0, 0.6); /* ajuste a intensidade */
+  z-index: 1;
+}
+
+/* Coloca a legenda acima do overlay, bem à esquerda */
+.caption-up {
+  position: absolute;
+  top: 120px;              /* distância do topo */
+  left: 5px;              /* quase encostado ao botão do carrossel */
+  text-align: left;       /* alinhamento do texto */
+  z-index: 2;
+  color: #fff;
+  max-width: 40%;         /* controla largura do bloco de texto */
+}
+
+/* Título e subtítulo alinhados */
+.caption-up h3 {
+  font-size: 2.6rem;      /* título maior */
+  font-weight: bold;
+  margin: 0;              /* remove espaçamento extra */
+}
+
+.caption-up p {
+  font-size: 1.5rem;      /* subtítulo maior */
+  margin: 0;              /* alinhado com o título */
+  margin-top: 8px;        /* pequeno espaço entre título e subtítulo */
+}
+
+/* Responsividade para tablets */
+@media (max-width: 768px) {
+  .caption-up {
+    top: 10px;
+    left: 10px;
+    max-width: 80%;       /* ocupa mais largura no mobile */
+  }
+
+  .caption-up h3 {
+    font-size: 1.6rem;    /* título menor */
+  }
+
+  .caption-up p {
+    font-size: 1rem;      /* subtítulo menor */
+  }
+
+  .carousel-item-relative img {
+    height: 300px;        /* reduz altura da imagem */
+    object-fit: cover;
+  }
+}
+
+/* Responsividade para celulares pequenos */
+@media (max-width: 480px) {
+  .caption-up {
+    top: 5px;
+    left: 5px;
+    max-width: 95%;
+  }
+
+  .caption-up h3 {
+    font-size: 1.2rem;
+  }
+
+  .caption-up p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Texto azul para INAGBE Cursos */
+.brand-text {
+  color: #007bff !important; /* azul Bootstrap */
+  font-weight: bold;
+  font-size: 1.4rem;
+}
+
+/* Ajuste do novo navbar */
+
+.menu-card-section {
+  text-align: center;
+}
+
+.menu-card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+}
+
+.menu-card {
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  width: 280px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.menu-card:hover {
+  transform: translateY(-5px);
+}
+
+.menu-card .icon {
+  font-size: 2.5rem;
+  color: #007bff;
+  margin-bottom: 10px;
+}
+
+.menu-card h4 {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+}
+
+.menu-card p {
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.card-link {
+  display: inline-block;
+  margin-top: 10px;
+  color: #007bff;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.card-link:hover {
+  text-decoration: underline;
+}
+.user-impact-section {
+  background-color: #f0f8ff;
+  padding: 40px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.impact-title {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #007bff;
+  margin-bottom: 15px;
+}
+
+.user-count {
+  font-size: 2.6rem;
+  color: #0056b3;
+}
+
+.impact-subtitle {
+  font-size: 1.2rem;
+  color: #333;
+  max-width: 700px;
+  margin: 0 auto;
+}
+.footer-section {
+  background-color: #001f3f; /* azul escuro institucional */
+  color: #f0f8ff;
+  padding: 40px 20px;
+  margin-top: 60px;
+}
+
+.footer-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.footer-column {
+  flex: 1;
+  min-width: 220px;
+}
+
+.footer-column h5 {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: #00aaff;
+}
+
+.footer-column ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-column ul li {
+  margin-bottom: 8px;
+}
+
+.footer-column ul li a {
+  color: #f0f8ff;
+  text-decoration: none;
+}
+
+.footer-column ul li a:hover {
+  text-decoration: underline;
+}
+
+.newsletter-btn {
+  background-color: #00aaff;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+.newsletter-btn-1 {
+  background-color: #00aaff;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+.newsletter-btn i {
+  margin-right: 6px;
+}
+
+.footer-bottom {
+  text-align: center;
+  margin-top: 40px;
+  border-top: 1px solid #007bff; /* a linha abaixo a cima da logo*/
+  padding-top: 20px;
+  font-size: 0.9rem;
+}
+
+.footer-logo {
+  height: 80px;       /* aumentei de 40px para 80px */
+  margin-bottom: 10px;
+  object-fit: contain; /* garante que não distorce */
+}
+.ranking-card {
+  background: #fdfdfd;
+  border: 1px solid #ddd;
+  transition: transform 0.2s ease;
+}
+
+
+
+
+
+.progress-bar {
+  font-weight: bold;
+}
+.section-title {
+  background: linear-gradient(90deg, #0d6efd, #6610f2); /* azul → roxo */
+  color: #fff;
+  padding: 15px 25px;
+  border-radius: 8px;
+  display: inline-block;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+
+.menu-card {
+  text-align: center;
+}
+
+.university-logo {
+  max-width: 120px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.university-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.btn-dark-yellow {
+  background-color: #b8860b; /* amarelo escuro */
+  color: white;              /* texto branco */
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.university-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+/* 🔹 Em telas pequenas, força layout em coluna */
+@media (max-width: 768px) {
+  .university-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .menu-card {
+    width: 100%; /* ocupa toda a largura disponível */
+    max-width: 320px; /* limite para não ficar exagerado */
+  }
+}

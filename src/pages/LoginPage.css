@@ -1,0 +1,44 @@
+.login-container {
+  min-height: 100vh;
+}
+
+.login-image {
+  height: 100vh; /* ocupa toda a altura da tela */
+}
+
+.login-img {
+  object-fit: cover; /* imagem cobre toda a área */
+  display: block;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 450px;
+  padding: 30px;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.login-title {
+  background: linear-gradient(90deg, #0d6efd, #6610f2);
+  color: #fff;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+
+.login-btn {
+  font-weight: bold;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.login-link {
+  color: #0d6efd;
+  text-decoration: none;
+}
+
+.login-link:hover {
+  text-decoration: underline;
+}

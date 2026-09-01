@@ -1,0 +1,172 @@
+/* Reset e Fontes */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', Arial, sans-serif;
+}
+
+body {
+  background-color: #f0f4f8;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Header */
+header {
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  color: white;
+  padding: 60px 20px 40px;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 3rem;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+header p {
+  font-size: 1.2rem;
+  font-weight: 400;
+}
+
+/* Navbar */
+nav {
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  padding: 15px 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+nav a {
+  color: #333;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+nav a:hover {
+  color: #2575fc;
+}
+
+/* Banner */
+.banner {
+  background: url('https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;
+  height: 350px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+  flex-direction: column;
+}
+
+.banner h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+}
+
+.banner p {
+  font-size: 1.1rem;
+  margin-top: 10px;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+}
+
+/* Container de cursos */
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 40px auto;
+}
+
+/* Cards de cursos */
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px;
+  justify-content: center;
+}
+
+.card {
+  background-color: white;
+  flex: 1 1 calc(33% - 25px);
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+}
+
+.card h3 {
+  color: #2575fc;
+  margin-bottom: 10px;
+  font-size: 1.4rem;
+}
+
+.card p {
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+  flex-grow: 1;
+}
+
+.card button {
+  background-color: #6a11cb;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.card button:hover {
+  background-color: #2575fc;
+}
+
+/* Footer */
+footer {
+  background-color: #2575fc;
+  color: white;
+  text-align: center;
+  padding: 30px 20px;
+  margin-top: 50px;
+}
+
+footer p {
+  font-size: 0.95rem;
+}
+
+/* Responsividade */
+@media (max-width: 1000px) {
+  .card {
+    flex: 1 1 calc(45% - 25px);
+  }
+}
+
+@media (max-width: 650px) {
+  nav {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .card {
+    flex: 1 1 100%;
+  }
+  .banner {
+    height: 250px;
+  }
+  .banner h2 {
+    font-size: 2rem;
+  }
+}
