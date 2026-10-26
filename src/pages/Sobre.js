@@ -25,24 +25,24 @@ export default function SobreNos() {
   const pessoas = [
   {
     foto: "/QJ.jpeg",
-    nome: "Queny João",
+    nome: "Batista Do Rosário Da Silva Quizunda",
     cargo: "Fundador e Desenvolvedor",
     descricao:
-      "Estudante do 2º ano de Medicina e desenvolvedor de software. Criador da Plataforma Kieza, com foco em educação digital, inovação tecnológica e preparação académica de qualidade.",
+      "Estudante do 2º ano da Faculdadde de Medicina da Universidade Rainha Njinga Mbande e desenvolvedor de software. Criador da Plataforma Kieza, com foco em educação digital, inovação tecnológica e preparação académica de qualidade.",
   },
   {
-    foto: "/pessoa2.jpg",
-    nome: "Equipa Académica",
-    cargo: "Apoio Pedagógico",
+    foto: "/gel.jpg",
+    nome: "Gelson Teodor Pedro Quindua",
+    cargo: "Desenvolvedor de Software e Game Dev",
     descricao:
-      "Uma equipa dedicada à produção de conteúdos educativos, materiais complementares e recursos que ajudam os estudantes a alcançarem os seus objetivos académicos.",
+      "Contribuidor, e por suas habilidades mostrou-se disponivel a compartilhar o seu conhecimento como prova de inovação, e desenvolvimento para a preparação adequada dos estudantes a nível nacional.",
   },
   {
-    foto: "/pessoa3.jpg",
-    nome: "Comunidade Kieza",
-    cargo: "Estudantes",
+    foto: "/Logótipo Baoba CTI_ Árvore Tecnológica.png",
+    nome: "Baoba C.T.I",
+    cargo: "Empresa Apoiadora",
     descricao:
-      "A força da plataforma está na sua comunidade. Estudantes de várias áreas utilizam os recursos da Kieza para melhorar o desempenho e aumentar as suas oportunidades de sucesso.",
+      "A Baoba CTI é uma Startup, focada em Ciência,Tecnologia e Inovação tendo se identificado com o propósito da plataforma Kieza, acordou como sendo a principal empresa apoiadora da plataforma. ",
   },
 ];
 
@@ -320,8 +320,8 @@ const pessoa = pessoas[activeIndex];
           <Col md={4}>
             <Card className="border-0 shadow p-4">
               <FaUsers size={45} color="#2563eb" />
-              <h2 className="mt-3">+500</h2>
-              <p>Estudantes Impactados</p>
+              <h2 className="mt-3">100%</h2>
+              <p>De foco na Impactação</p>
             </Card>
           </Col>
 

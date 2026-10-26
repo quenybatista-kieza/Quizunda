@@ -66,7 +66,7 @@ export default function Contato() {
               <Card.Text>Queny Junior QJ</Card.Text>
               <Button
                 variant="primary"
-                href="https://facebook.com"
+                href="https://web.facebook.com/quenyfelix.daluz/"
                 target="_blank"
                 className="mt-2"
               >
@@ -95,24 +95,7 @@ export default function Contato() {
           </Card>
         </Col>
 
-        {/* GitHub */}
-        <Col md={3} className="mb-4">
-          <Card className="shadow-lg border-0 h-100 text-center">
-            <Card.Body>
-              <FaGithub size={40} style={{ color: "#333", marginBottom: "15px" }} />
-              <Card.Title style={{ fontWeight: "bold" }}>GitHub</Card.Title>
-              <Card.Text>github.com/QuenyJunior</Card.Text>
-              <Button
-                variant="dark"
-                href="https://github.com/QuenyJunior"
-                target="_blank"
-                className="mt-2"
-              >
-                Ver Projetos
-              </Button>
-            </Card.Body>
-          </Card>
-        </Col>
+        
       </Row>
 
       {/* Apoio ao Cliente */}
@@ -121,7 +104,7 @@ export default function Contato() {
           <FaPhone size={35} style={{ color: "#006400", marginBottom: "10px" }} />
           <h4 style={{ fontWeight: "bold" }}>Fale Conosco</h4>
           <p style={{ fontSize: "1.2rem", color: "#333" }}>
-            Deixe seu SMS para apoio ao cliente: <strong>932134493</strong>
+            Deixe seu SMS para apoio ao cliente: <strong>941908927</strong>
           </p>
         </Col>
       </Row>
