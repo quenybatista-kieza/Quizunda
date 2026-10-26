@@ -3,6 +3,7 @@ import {useNavigate} from "react-router-dom"
 import { Navbar, Nav, Button, Row, Col, Dropdown, Card } from "react-bootstrap";
 import { FaGraduationCap, FaBook, FaFolderOpen, FaChartBar, FaVideo, FaHistory } from "react-icons/fa";
 import ExamVerticalHistogram from "../components/ExamChart";
+import { FaWhatsapp } from "react-icons/fa";
 import { saveVideoOffline, getVideoOffline, getAllOfflineVideos,deleteVideoOffline } from "../components/indexedDB";
 
 
@@ -13,6 +14,9 @@ export default function PortalPage() {
   const navigate = useNavigate();
   
   const [cursos, setCursos] = useState([]);
+  const [supportWhatsapp, setSupportWhatsapp] = useState("");
+  
+  const [courses, setCourses] = useState([]);
   const [offlineVideos, setOfflineVideos] = useState([]);
 
   const [loading, setLoading] = useState(true);
@@ -64,6 +68,9 @@ export default function PortalPage() {
     }
     fetchCursos();
   }, []);
+
+
+  
 
   async function loadOfflineVideos() {
     const keys = await getAllOfflineVideos();
@@ -123,7 +130,7 @@ export default function PortalPage() {
       {/* Navbar */}
       <Navbar bg="light" expand="lg" className="mb-4 px-3 shadow-sm">
         <Navbar.Brand href="#" className="me-4">
-          <img src="/urnm.png" alt="Logo" height="60" style={{ marginRight: "15px" }} />
+          <img src="/chapeu.png" alt="Logo" height="80" style={{ marginRight: "15px" }} />
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-between">
@@ -137,7 +144,36 @@ export default function PortalPage() {
                 <Dropdown.Divider />
                 <Dropdown.Item onClick={() => handleLogout(navigate)}>
                   Terminar Sessão
-                </Dropdown.Item>                
+                </Dropdown.Item> 
+                      <Dropdown.Item
+                    onClick={() => {
+
+                      if (!supportWhatsapp) {
+                        alert("Selecione primeiro um curso.");
+                        return;
+                      }
+
+                      const mensagem = encodeURIComponent(
+                        "Olá! Preciso de ajuda com o curso."
+                      );
+
+                      window.open(
+                        `https://wa.me/${supportWhatsapp}?text=${mensagem}`,
+                        "_blank"
+                      );
+                    }}
+                  >
+                    <FaWhatsapp
+                      style={{
+                        color: "#25D366",
+                        marginRight: "8px"
+                      }}
+                    />
+
+                    Suporte a Dúvidas
+                  </Dropdown.Item>
+                
+               
               </Dropdown.Menu>
             </Dropdown>
           </Nav>
@@ -182,6 +218,7 @@ export default function PortalPage() {
                 videoLessonsArray: data.video_lessons || [],
                 supportMaterials: data.support_materials || []
               });
+              setSupportWhatsapp(data.support_whatsapp || "");
               console.log(data.support_materials)
             }catch (err){
               console.error("Erro ao buscar curso:", err)
@@ -278,25 +315,151 @@ export default function PortalPage() {
     </div>
 
     {/* 🔹 Botão de download via Google Drive (offline) */}
-    <button
-  className="btn btn-outline-primary"
+   
+{/* Botão para guardar o vídeo do Google Drive offline */}
+
+{/* Botão para descarregar o vídeo para o dispositivo */}
+
+<Button
+  variant="outline-primary"
+  disabled={!selectedVideo.url_drive}
   onClick={async () => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const res = await fetch(`/api/videos/${selectedVideo.id}/download`, {
-      headers: { Authorization: `Bearer ${user.token}` }
-    });
-    const data = await res.json();
+    let fileURL = null;
 
-    const fileRes = await fetch(data.downloadUrl);
-    const blob = await fileRes.blob();
+    try {
+      const user = JSON.parse(
+        localStorage.getItem("user") || "null"
+      );
 
-    await saveVideoOffline(selectedVideo.id, blob);
-    alert("Vídeo salvo para acesso offline!");
-    loadOfflineVideos();
+      if (!user?.token) {
+        alert("Inicia sessão para descarregar o vídeo.");
+        return;
+      }
+
+      if (!selectedVideo.url_drive) {
+        alert("Esta vídeo-aula não tem um link do Google Drive.");
+        return;
+      }
+
+      const res = await fetch(
+        `http://localhost:5000/api/videos/${selectedVideo.id}/download`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+
+        throw new Error(
+          errorData.message ||
+          "Não foi possível descarregar o vídeo."
+        );
+      }
+
+      const contentType = (
+        res.headers.get("content-type") || ""
+      ).toLowerCase();
+
+      // Não guardar páginas HTML ou respostas JSON como vídeos.
+      if (
+        contentType.includes("text/html") ||
+        contentType.includes("application/json")
+      ) {
+        throw new Error(
+          "O servidor não devolveu o ficheiro de vídeo. Verifica o backend."
+        );
+      }
+
+      const blob = await res.blob();
+
+      if (!blob.size) {
+        throw new Error("O ficheiro recebido está vazio.");
+      }
+
+      // Determinar a extensão pelo formato real recebido.
+      const header = new Uint8Array(
+        await blob.slice(0, 12).arrayBuffer()
+      );
+
+      const isMP4 =
+        header.length >= 8 &&
+        String.fromCharCode(...header.slice(4, 8)) === "ftyp";
+
+      const isWebM =
+        header.length >= 4 &&
+        header[0] === 0x1A &&
+        header[1] === 0x45 &&
+        header[2] === 0xDF &&
+        header[3] === 0xA3;
+
+      let extension = ".mp4";
+
+      if (isMP4) {
+        extension = ".mp4";
+      } else if (isWebM) {
+        extension = ".webm";
+      } else if (contentType.includes("video/quicktime")) {
+        extension = ".mov";
+      } else if (contentType.includes("video/x-matroska")) {
+        extension = ".mkv";
+      } else if (contentType.includes("video/x-msvideo")) {
+        extension = ".avi";
+      } else if (contentType.includes("video/")) {
+        extension = contentType.includes("webm")
+          ? ".webm"
+          : ".video";
+      } else if (!contentType.includes("application/octet-stream")) {
+        console.error("Formato recebido:", contentType);
+        throw new Error(
+          "O formato recebido não foi reconhecido como vídeo."
+        );
+      }
+
+      // Preparar o nome do ficheiro.
+      const safeTitle = (selectedVideo.title || "video")
+        .replace(/[<>:"/\\|?*\x00-\x1F]/g, "_")
+        .trim();
+
+      const fileName = `${safeTitle || "video"}${extension}`;
+
+      // Iniciar o download para o dispositivo.
+      fileURL = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = fileURL;
+      link.download = fileName;
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      alert(
+        `Download iniciado: ${fileName}\nVerifica a pasta Downloads do teu dispositivo.`
+      );
+    } catch (error) {
+      console.error("Erro ao descarregar o vídeo:", error);
+
+      alert(
+        error.message || "Ocorreu um erro ao descarregar o vídeo."
+      );
+    } finally {
+      if (fileURL) {
+        setTimeout(() => {
+          window.URL.revokeObjectURL(fileURL);
+        }, 60000);
+      }
+    }
   }}
 >
-  Baixar Offline
-</button>
+  Descarregar Vídeo
+</Button>
+
+
+
 
   </div>
 )}

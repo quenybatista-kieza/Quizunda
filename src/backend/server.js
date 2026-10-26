@@ -7,6 +7,7 @@ const path = require("path");
 const fs = require('fs')
 const bcrypt = require("bcryptjs");
 const router = express.Router();
+const axios = require("axios");
 
 const registerRoutes = require("./register.js");
 const loginRoutes = require("./login.js");
@@ -164,31 +165,73 @@ app.delete("/api/courses/:id", auth, async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Primeiro eliminamos os dados relacionados ao curso
-    await db.query("DELETE FROM exam_questions WHERE roomId IN (SELECT id FROM exam_rooms WHERE courseId = ?)", [id]);
-    await db.query("DELETE FROM exam_classes WHERE courseId = ?", [id]);
-    await db.query("DELETE FROM support_materials WHERE courseId = ?", [id]);
-    await db.query("DELETE FROM complementary_materials WHERE courseId = ?", [id]);
-    await db.query("DELETE FROM video_lessons WHERE courseId = ?", [id]);
-    await db.query("DELETE FROM compras WHERE curso_id = ?", [id]);
+    // Eliminar perguntas associadas às classes do curso
+    await db.query(`
+      DELETE FROM exam_questions
+      WHERE roomId IN (
+        SELECT id
+        FROM exam_classes
+        WHERE courseId = ?
+      )
+    `, [id]);
 
-    // Agora eliminamos o curso
-    const [result] = await db.query("DELETE FROM courses WHERE id = ? AND ownerId = ?", [
-      id,
-      req.user.id,
-    ]);
+    // Eliminar classes do curso
+    await db.query(
+      "DELETE FROM exam_classes WHERE courseId = ?",
+      [id]
+    );
+
+    // Eliminar materiais associados
+    await db.query(
+      "DELETE FROM support_materials WHERE courseId = ?",
+      [id]
+    );
+
+    await db.query(
+      "DELETE FROM complementary_materials WHERE courseId = ?",
+      [id]
+    );
+
+    await db.query(
+      "DELETE FROM video_lessons WHERE courseId = ?",
+      [id]
+    );
+
+    await db.query(
+      "DELETE FROM compras WHERE curso_id = ?",
+      [id]
+    );
+
+    // Eliminar curso destacado (se existir essa tabela)
+    await db.query(
+      "DELETE FROM featured_courses WHERE courseId = ?",
+      [id]
+    ).catch(() => {});
+
+    // Eliminar o curso
+    const [result] = await db.query(
+      "DELETE FROM courses WHERE id = ? AND ownerId = ?",
+      [id, req.user.id]
+    );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "Curso não encontrado ou não pertence ao usuário" });
+      return res.status(404).json({
+        error: "Curso não encontrado ou não pertence ao utilizador"
+      });
     }
 
-    res.json({ message: "Curso e todos os dados relacionados foram excluídos com sucesso!" });
+    res.json({
+      message: "Curso e todos os dados relacionados foram excluídos com sucesso!"
+    });
+
   } catch (err) {
     console.error("Erro ao deletar curso:", err);
-    res.status(500).json({ error: "Erro ao excluir curso e dados relacionados" });
+
+    res.status(500).json({
+      error: err.message
+    });
   }
 });
-
 
 
 // Upload Material de Apoio
@@ -249,6 +292,22 @@ app.post("/api/complements", auth, async (req, res) => {
   }
 });
 
+app.get('/api/perguntas', async (req, res) => {
+  try {
+    const [results] = await db.query(
+      'SELECT * FROM exam_questions ORDER BY id DESC'
+    );
+
+    res.status(200).json(results);
+  } catch (err) {
+    console.error('Erro ao buscar perguntas:', err);
+
+    res.status(500).json({
+      message: 'Erro ao buscar perguntas'
+    });
+  }
+});
+
 
 
 // Criar sala de exame
@@ -286,9 +345,6 @@ app.get("/api/exam-classes", auth, async (req, res) => {
     res.status(500).json({ error: "Erro ao listar salas de exame" });
   }
 });
-
-
-
 
 // Criar questão vinculada a uma sala de exame
 app.post("/api/exam-questions", auth, async (req, res) => {
@@ -409,75 +465,109 @@ app.get("/api/pais", async (req, res) => {
 });
 
 // Rota para listar materiais complementares
-app.get("/api/materials", async (req, res) => {
+app.get("/api/materials", auth, async (req, res) => {
   try {
+    const userId = req.user.id;
+
     const [rows] = await db.query(`
-      SELECT id, tema, disciplina, materials
-      FROM complementary_materials
-      ORDER BY id DESC
-    `);
+      SELECT DISTINCT
+        cm.id,
+        cm.tema,
+        cm.disciplina,
+        cm.materials
+      FROM complementary_materials cm
+      INNER JOIN compras cp
+        ON cp.curso_id = cm.courseId
+      WHERE cp.user_id = ?
+      AND (
+        cp.data_expiracao IS NULL
+        OR cp.data_expiracao >= CURDATE()
+      )
+      ORDER BY cm.id DESC
+    `, [userId]);
+
     res.json(rows);
+
   } catch (err) {
     console.error("Erro ao buscar materiais:", err);
-    res.status(500).json({ error: "Erro ao buscar materiais" });
+    res.status(500).json({
+      error: "Erro ao buscar materiais"
+    });
   }
 });
 
 //Rota para listar as salas de exame!
 
-app.get("/api/salas", async (req, res) => {
+app.get("/api/salas", auth, async (req, res) => {
   try {
+    const userId = req.user.id;
+
     const [rows] = await db.query(`
-      SELECT e.id AS examRoomId, e.roomName, c.title AS courseName
+      SELECT DISTINCT
+        e.id AS examRoomId,
+        e.roomName,
+        c.title AS courseName
       FROM exam_classes e
-      INNER JOIN courses c ON e.courseId = c.id
-      
-    `);
+      INNER JOIN courses c
+        ON e.courseId = c.id
+      INNER JOIN compras cp
+        ON cp.curso_id = c.id
+      WHERE cp.user_id = ?
+      AND (
+        cp.data_expiracao IS NULL
+        OR cp.data_expiracao >= CURDATE()
+      )
+    `, [userId]);
+
     res.json(rows);
+
   } catch (err) {
     console.error("Erro ao buscar salas:", err);
-    res.status(500).json({ error: "Erro ao buscar salas" });
+    res.status(500).json({
+      error: "Erro ao buscar salas"
+    });
   }
 });
-
 
 // cursos
 app.get("/api/cursos", async (req, res) => {
   try {
     const [rows] = await db.query(`
       SELECT 
-        title,
-        id,
-        description,
-        price,
-        duration,
-        country,
-        thumbnail
-      FROM courses
+        c.title,
+        c.id,
+        c.description,
+        c.price,
+        c.duration,
+        c.country,
+        c.thumbnail,
+        cc.payment_whatsapp
+      FROM courses c
+      LEFT JOIN course_contacts cc
+        ON cc.course_id = c.id
     `);
 
-    // Ajustar para o front-end
     const formatted = rows.map(course => ({
       title: course.title,
-      id:course.id,
-      descrição: course.description, // texto descritivo
-      area: course.description,      // usado para agrupar nas áreas
+      id: course.id,
+      descrição: course.description,
+      area: course.description,
       price: course.price,
       duration: course.duration,
       country: course.country,
-      thumbnail: course.thumbnail
+      thumbnail: course.thumbnail,
+      payment_whatsapp: course.payment_whatsapp
     }));
 
     res.json(formatted);
+
   } catch (err) {
     console.error("Erro ao buscar cursos:", err);
     res.status(500).json({ error: "Erro ao buscar cursos" });
   }
-
 });
-
 // rota para os cursos comprados
-
+//esta é a rota dos cursos comprados que eu vou usar com API
 app.post("/api/comprar", auth, async (req, res) => {
   try {
     const courseId = req.body.courseId;
@@ -567,30 +657,71 @@ app.get("/api/compras", auth, async (req, res) => {
 });
 
 
-app.get("/api/detalhes_c/:id", auth, async(req, res)=>{
+app.get("/api/detalhes_c/:id", auth, async (req, res) => {
   const cursoId = req.params.id;
-  console.log(req.params.id)
-  try{
+
+  try {
     const [video_lessons] = await db.query(
-      " SELECT * from video_lessons WHERE courseId = ?",
+      "SELECT * FROM video_lessons WHERE courseId = ?",
       [cursoId]
-      );
+    );
 
     const [support_materials] = await db.query(
-      " SELECT * from support_materials WHERE courseId = ?",
+      "SELECT * FROM support_materials WHERE courseId = ?",
       [cursoId]
-      );
+    );
+
+    const [contact] = await db.query(
+      `
+      SELECT support_whatsapp
+      FROM course_contacts
+      WHERE course_id = ?
+      LIMIT 1
+      `,
+      [cursoId]
+    );
 
     res.json({
       video_lessons,
-      support_materials
+      support_materials,
+      support_whatsapp:
+        contact.length > 0
+          ? contact[0].support_whatsapp
+          : null
     });
 
-  }catch(err){
+  } catch (err) {
     console.error(err);
-    res.status(500).json({message: "Erro no servidor"})
+    res.status(500).json({
+      message: "Erro no servidor"
+    });
   }
 });
+
+app.get("/api/recuperar-senha", async (req, res) => {
+  try {
+
+    const [rows] = await db.query(`
+      SELECT
+        id,
+        nome,
+        numeroouemail,
+        sugerir_nova_senha
+      FROM recuperar_senha
+      ORDER BY id DESC
+    `);
+
+    res.json(rows);
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      message: "Erro ao buscar registros"
+    });
+  }
+});
+
 
 // 2. FUNÇÃO PARA EMBARALHAR OPÇÕES
 function embaralharOpcoes(pergunta) {
@@ -768,37 +899,133 @@ app.get("/api/videos/:id/download", auth, async (req, res) => {
   try {
     const videoId = req.params.id;
 
-    // Busca o vídeo no banco
+    // 1. Buscar o vídeo no banco de dados
     const [rows] = await db.query(
-      "SELECT url, url_drive, disciplina, courseId FROM video_lessons WHERE id = ?",
+      `SELECT url, url_drive, disciplina, courseId
+       FROM video_lessons
+       WHERE id = ?`,
       [videoId]
     );
+
     if (rows.length === 0) {
-      return res.status(404).json({ message: "Vídeo não encontrado" });
+      return res.status(404).json({
+        message: "Vídeo não encontrado."
+      });
     }
 
     const video = rows[0];
 
-    // 🔹 Valida se o curso ainda está dentro do prazo de 1 ano
+    if (!video.url_drive) {
+      return res.status(404).json({
+        message: "Este vídeo não tem um link do Google Drive."
+      });
+    }
+
+    // 2. Validar a compra do curso
     const [compras] = await db.query(
-      "SELECT data_expiracao FROM compras WHERE curso_id = ? AND user_id = ?",
+      `SELECT data_expiracao
+       FROM compras
+       WHERE curso_id = ? AND user_id = ?`,
       [video.courseId, req.user.id]
     );
 
     if (compras.length === 0) {
-      return res.status(403).json({ message: "Curso não comprado" });
+      return res.status(403).json({
+        message: "Curso não comprado."
+      });
     }
 
-    const compra = compras[0];
-    if (new Date(compra.data_expiracao) < new Date()) {
-      return res.status(403).json({ message: "Acesso expirado. Renove o curso para continuar." });
+    if (
+      !compras[0].data_expiracao ||
+      new Date(compras[0].data_expiracao) < new Date()
+    ) {
+      return res.status(403).json({
+        message: "Acesso expirado. Renove o curso."
+      });
     }
 
-    // 🔹 Retorna o link do Google Drive para download
-    res.json({ downloadUrl: video.url_drive });
+    // 3. Extrair o ID do ficheiro do Google Drive
+    const match = video.url_drive.match(
+      /\/file\/d\/([a-zA-Z0-9_-]+)|[?&]id=([a-zA-Z0-9_-]+)/
+    );
+
+    const driveId = match && (match[1] || match[2]);
+
+    if (!driveId) {
+      return res.status(400).json({
+        message: "O link do Google Drive não é válido."
+      });
+    }
+
+    // 4. Pedir o ficheiro real ao Google Drive
+    const driveUrl =
+      `https://drive.google.com/uc?export=download&id=${driveId}`;
+
+    const driveResponse = await axios.get(driveUrl, {
+      responseType: "stream",
+      maxRedirects: 5,
+      timeout: 120000,
+      validateStatus: (status) => status >= 200 && status < 300
+    });
+
+    const contentType =
+      driveResponse.headers["content-type"] || "";
+
+    // Evitar enviar uma página HTML como se fosse um vídeo
+    if (
+      contentType.includes("text/html") ||
+      contentType.includes("application/json")
+    ) {
+      driveResponse.data.destroy();
+
+      return res.status(502).json({
+        message:
+          "O Google Drive não devolveu o vídeo. Verifica as permissões do ficheiro."
+      });
+    }
+
+    // 5. Enviar o ficheiro ao navegador
+    const safeName = `video-${videoId}.mp4`;
+
+    res.setHeader(
+      "Content-Type",
+      contentType || "application/octet-stream"
+    );
+
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${safeName}"`
+    );
+
+    if (driveResponse.headers["content-length"]) {
+      res.setHeader(
+        "Content-Length",
+        driveResponse.headers["content-length"]
+      );
+    }
+
+    driveResponse.data.on("error", (err) => {
+      console.error("Erro na transmissão do vídeo:", err);
+
+      if (!res.headersSent) {
+        res.status(502).end("Erro ao transmitir o vídeo.");
+      } else {
+        res.destroy(err);
+      }
+    });
+
+    driveResponse.data.pipe(res);
+
   } catch (err) {
-    console.error("Erro ao baixar vídeo:", err);
-    res.status(500).json({ message: "Erro interno no servidor" });
+    console.error("Erro ao descarregar vídeo:", err.message);
+
+    if (!res.headersSent) {
+      res.status(500).json({
+        message: "Erro ao obter o ficheiro de vídeo."
+      });
+    } else {
+      res.destroy(err);
+    }
   }
 });
 
@@ -880,6 +1107,7 @@ app.delete("/api/courses_1/:id", async (req, res) => {
       "DELETE FROM exam_questions WHERE roomId IN (SELECT id FROM exam_rooms WHERE courseId = ?)",
       [id]
     );
+    await db.query("DELETE FROM exam_questions WHERE roomId IN (SELECT id FROM exam_rooms WHERE courseId = ?)", [id]);
     await db.query("DELETE FROM exam_classes WHERE courseId = ?", [id]);
     await db.query("DELETE FROM support_materials WHERE courseId = ?", [id]);
     await db.query("DELETE FROM complementary_materials WHERE courseId = ?", [id]);
@@ -1289,6 +1517,131 @@ app.post("/api/recuperar_senha", async (req, res) => {
   }
 });
 
+app.get("/api/course-contacts", async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      "SELECT * FROM course_contacts ORDER BY id DESC"
+    );
+
+    res.json(rows);
+  } catch (err) {
+    console.error("Erro ao listar contactos:", err);
+    res.status(500).json({
+      error: "Erro interno ao listar contactos"
+    });
+  }
+});
+
+app.get("/api/course-contacts/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!Number.isInteger(Number(id)) || Number(id) <= 0) {
+      return res.status(400).json({
+        error: "ID inválido"
+      });
+    }
+
+    const [rows] = await db.query(
+      "SELECT * FROM course_contacts WHERE id = ?",
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        error: "Contacto não encontrado"
+      });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error("Erro ao consultar contacto:", err);
+    res.status(500).json({
+      error: "Erro interno ao consultar contacto"
+    });
+  }
+});
+
+app.put("/api/course-contacts/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      course_id,
+      support_whatsapp,
+      payment_whatsapp
+    } = req.body;
+
+    if (!Number.isInteger(Number(id)) || Number(id) <= 0) {
+      return res.status(400).json({
+        error: "ID inválido"
+      });
+    }
+
+    if (
+      course_id === undefined ||
+      !Number.isInteger(Number(course_id)) ||
+      Number(course_id) <= 0 ||
+      typeof support_whatsapp !== "string" ||
+      typeof payment_whatsapp !== "string" ||
+      !support_whatsapp.trim() ||
+      !payment_whatsapp.trim() ||
+      support_whatsapp.trim().length > 20 ||
+      payment_whatsapp.trim().length > 20
+    ) {
+      return res.status(400).json({
+        error: "Preenche corretamente todos os campos obrigatórios"
+      });
+    }
+
+    const [existing] = await db.query(
+      "SELECT id FROM course_contacts WHERE id = ?",
+      [id]
+    );
+
+    if (existing.length === 0) {
+      return res.status(404).json({
+        error: "Contacto não encontrado"
+      });
+    }
+
+    const [result] = await db.query(
+      `UPDATE course_contacts
+       SET course_id = ?,
+           support_whatsapp = ?,
+           payment_whatsapp = ?
+       WHERE id = ?`,
+      [
+        Number(course_id),
+        support_whatsapp.trim(),
+        payment_whatsapp.trim(),
+        id
+      ]
+    );
+
+    const [rows] = await db.query(
+      "SELECT * FROM course_contacts WHERE id = ?",
+      [id]
+    );
+
+    res.json({
+      message: "Contacto atualizado com sucesso",
+      contact: rows[0]
+    });
+  } catch (err) {
+    console.error("Erro ao atualizar contacto:", err);
+
+    if (err.code === "ER_DUP_ENTRY") {
+      return res.status(409).json({
+        error: "Este curso já está associado a outro contacto"
+      });
+    }
+
+    res.status(500).json({
+      error: "Erro interno ao atualizar contacto"
+    });
+  }
+});
+
 
 // Rota para listar todos os registros
 // Rota para listar todos os registros de recuperar_senha
@@ -1314,6 +1667,188 @@ app.delete("/api/recuperar_senha/:id", async (req, res) => {
     res.status(500).json({ error: "Erro interno ao eliminar registro" });
   }
 });
+
+
+app.post('/api/course-contacts', async (req, res) => {
+  try {
+    const {
+      courseId,
+      supportWhatsapp,
+      paymentWhatsapp
+    } = req.body;
+
+    if (!courseId || !supportWhatsapp || !paymentWhatsapp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Todos os campos são obrigatórios.'
+      });
+    }
+
+    const sql = `
+      INSERT INTO course_contacts (
+        course_id,
+        support_whatsapp,
+        payment_whatsapp
+      )
+      VALUES (?, ?, ?)
+    `;
+
+    db.query(
+      sql,
+      [
+        courseId,
+        supportWhatsapp,
+        paymentWhatsapp
+      ],
+      (err, result) => {
+
+        if (err) {
+          console.error(err);
+
+          return res.status(500).json({
+            success: false,
+            message: 'Erro ao salvar configuração.'
+          });
+        }
+
+        res.status(201).json({
+          success: true,
+          message: 'Configuração salva com sucesso!',
+          id: result.insertId
+        });
+
+      }
+    );
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: 'Erro interno do servidor.'
+    });
+  }
+});
+
+
+/* ADICIONAR PERGUNTA */
+app.post('/api/perguntas', async (req, res) => {
+  try {
+    const {
+      roomId,
+      question,
+      correctAnswer,
+      wrongAnswer1,
+      wrongAnswer2,
+      wrongAnswer3,
+      wrongAnswer4,
+      ownerId,
+      tema,
+      disciplina
+    } = req.body;
+
+    if (
+      !roomId ||
+      !question?.trim() ||
+      !correctAnswer?.trim() ||
+      !ownerId ||
+      !tema?.trim() ||
+      !disciplina?.trim()
+    ) {
+      return res.status(400).json({
+        message: 'Preenche todos os campos obrigatórios.'
+      });
+    }
+
+    const sql = `
+      INSERT INTO exam_questions
+      (
+        roomId, question, correctAnswer,
+        wrongAnswer1, wrongAnswer2,
+        wrongAnswer3, wrongAnswer4,
+        ownerId, tema, disciplina
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      roomId,
+      question.trim(),
+      correctAnswer.trim(),
+      wrongAnswer1 || null,
+      wrongAnswer2 || null,
+      wrongAnswer3 || null,
+      wrongAnswer4 || null,
+      ownerId,
+      tema.trim(),
+      disciplina.trim()
+    ];
+
+    const [result] = await db.query(sql, values);
+
+    res.status(201).json({
+      message: 'Pergunta adicionada com sucesso!',
+      id: result.insertId
+    });
+  } catch (err) {
+    console.error('Erro ao adicionar pergunta:', err);
+    res.status(500).json({
+      message: 'Erro ao adicionar pergunta.'
+    });
+  }
+});
+
+
+/* ELIMINAR PERGUNTA PELO ID */
+app.delete('/api/perguntas/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!/^\d+$/.test(id) || Number(id) < 1) {
+      return res.status(400).json({
+        message: 'ID da pergunta inválido.'
+      });
+    }
+
+    const [result] = await db.query(
+      'DELETE FROM exam_questions WHERE id = ?',
+      [id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        message: 'Pergunta não encontrada.'
+      });
+    }
+
+    res.json({
+      message: 'Pergunta eliminada com sucesso!'
+    });
+  } catch (err) {
+    console.error('Erro ao eliminar pergunta:', err);
+    res.status(500).json({
+      message: 'Erro ao eliminar pergunta.'
+    });
+  }
+});
+
+
+app.get('/api/salas_e', async (req, res) => {
+  try {
+    const [results] = await db.query(
+      'SELECT * FROM exam_classes ORDER BY id DESC'
+    );
+
+    res.status(200).json(results);
+  } catch (err) {
+    console.error('Erro ao buscar salas:', err);
+
+    res.status(500).json({
+      message: 'Erro ao buscar salas.'
+    });
+  }
+});
+
 
 
 

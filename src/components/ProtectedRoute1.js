@@ -1,9 +1,9 @@
 // src/components/ProtectedRoute_1.js
 import React, { useContext } from "react";
 import { Navigate } from "react-router-dom";
-import { AdminAuthContext } from "../context/AuthContext_1";
+import { AdminAuthContext } from "../context/AuthContext1";
 
-export default function ProtectedRoute_1({ children, allowedUsers }) {
+export default function ProtectedRoute1({ children, allowedUsers }) {
   const { admin } = useContext(AdminAuthContext);
 
   // 🔹 Se não houver admin logado, bloqueia

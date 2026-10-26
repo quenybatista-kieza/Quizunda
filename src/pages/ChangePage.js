@@ -9,21 +9,36 @@ function SalasDeExame({ cursoId }) {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    async function carregarSalas() {
-      try {
-        const response = await fetch("http://localhost:5000/api/salas");
-        const data = await response.json();
-        setSalas(data);
-      } catch (error) {
-        console.error("Erro ao carregar salas:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
+useEffect(() => {
+  async function carregarSalas() {
+    try {
+      const token = localStorage.getItem("token");
 
-    carregarSalas();
-  }, [cursoId]);
+      const response = await fetch(
+        "http://localhost:5000/api/salas",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      // Garantir que salas será sempre um array
+      setSalas(Array.isArray(data) ? data : []);
+
+    } catch (error) {
+      console.error("Erro ao carregar salas:", error);
+      setSalas([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  carregarSalas();
+}, [cursoId]);
 
   return (
     <Container className="mt-4">

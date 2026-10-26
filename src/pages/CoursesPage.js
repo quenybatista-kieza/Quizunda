@@ -3,7 +3,8 @@ import AppNavbar from "../components/AppNavbar";
 import CoursesSearchBar from "../components/CoursesSearchBar";
 import { Card, Button, Row, Col, Modal, Spinner } from "react-bootstrap";
 import { FaShoppingCart, FaInfoCircle } from "react-icons/fa";
-import "./CoursesPage.css";
+import { FaWhatsapp } from "react-icons/fa";
+
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState([]);
@@ -172,28 +173,30 @@ export default function CoursesPage() {
                           </Card.Text>
 
                           {/* Botão Comprar */}
+                          
 <Button
   variant="dark"
   className="mt-auto w-100"
   onClick={() => {
-    const user = JSON.parse(localStorage.getItem("user"));
+    console.log(course);
 
-    if (!user) {
-      alert("Você precisa estar logado para acessar a área Banco.");
+    const mensagem = encodeURIComponent(
+      `Olá! Tenho interesse no curso ${course.title}.`
+    );
+
+    if (!course.payment_whatsapp) {
+      alert('Este curso ainda não possui contacto de pagamento configurado.');
       return;
     }
 
-    if (user.role !== "estudante") {
-      alert("Apenas estudantes podem acessar a área Banco.");
-      return;
-    }
-
-    // 🔹 Se passou nas verificações, navega para a tela Banco
-    window.location.href = "/banco";
+    window.open(
+      `https://wa.me/${course.payment_whatsapp}?text=${mensagem}`,
+      "_blank"
+    );
   }}
 >
-  <FaShoppingCart style={{ marginRight: "8px" }} />
-  Comprar
+  <FaWhatsapp style={{ marginRight: "8px" }} />
+  Comprar Curso
 </Button>
 
 

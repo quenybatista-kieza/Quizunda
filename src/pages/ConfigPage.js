@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button, Card, Modal, Form } from "react-bootstrap";
-import { FaBook } from "react-icons/fa"; // ícone de livros
+
 import { useNavigate } from "react-router-dom"; // botão voltar
 import { Container, Navbar, Nav, Carousel, NavDropdown } from 'react-bootstrap';
 
@@ -16,16 +16,25 @@ export default function MeusCursos() {
   const [showSupportModal, setShowSupportModal] = useState(false);
   const [showComplementModal, setShowComplementModal] = useState(false);
   const [showQuestionModal, setShowQuestionModal] = useState(false);
-
+  const [showConfigModal, setShowConfigModal] = useState(false);
+  const [loadingCourses, setLoadingCourses] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [complements, setComplements] = useState([]);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [showBankdModal, setShowBankdModal] = useState(false);
+  // recriar o modal para adicionar a conta do whatsapp!
  
 
   // ---------------- ESTADOS PARA FORMULÁRIOS ----------------
   const [examForm, setExamForm] = useState({ 
   courseId: "", 
   roomName: ""
+});
+
+const [configForm, setConfigForm] = useState({
+  courseId: '',
+  supportWhatsapp: '',
+  paymentWhatsapp: '',
 });
 
 const [videoForm, setVideoForm] = useState({
@@ -92,28 +101,61 @@ const [supportForm, setSupportForm] = useState({
   const user = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
 
-  function getEmbedUrl(url) {
-  if (url.includes("youtube.com/watch?v=")) {
-    const videoId = url.split("v=")[1].split("&")[0];
-    return `https://www.youtube.com/embed/${videoId}?rel=0`;
+const getEmbedUrl = (url) => {
+  if (!url?.trim()) return "";
+
+  try {
+    const parsedUrl = new URL(url.trim());
+    const hostname = parsedUrl.hostname
+      .toLowerCase()
+      .replace(/^www\./, "");
+
+    let videoId = "";
+
+    // YouTube: vídeos normais, Shorts e links de incorporação
+    if (
+      hostname === "youtube.com" ||
+      hostname === "m.youtube.com" ||
+      hostname === "youtube-nocookie.com"
+    ) {
+      const match = parsedUrl.pathname.match(
+        /^\/(?:shorts|embed|live)\/([a-zA-Z0-9_-]+)/
+      );
+
+      videoId = parsedUrl.searchParams.get("v") || match?.[1];
+
+      if (videoId && /^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
+        return `https://www.youtube.com/embed/${videoId}`;
+      }
+    }
+
+    // YouTube: links curtos youtu.be
+    if (hostname === "youtu.be") {
+      videoId = parsedUrl.pathname.split("/").filter(Boolean)[0];
+
+      if (videoId && /^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
+        return `https://www.youtube.com/embed/${videoId}`;
+      }
+    }
+
+    // Vimeo
+    if (hostname === "vimeo.com") {
+      videoId = parsedUrl.pathname.split("/").filter(Boolean).pop();
+
+      if (videoId && /^\d+$/.test(videoId)) {
+        return `https://player.vimeo.com/video/${videoId}`;
+      }
+    }
+
+    return "";
+  } catch {
+    return "";
   }
-  if (url.includes("youtu.be/")) {
-    const videoId = url.split("youtu.be/")[1];
-    return `https://www.youtube.com/embed/${videoId}?rel=0`;
-  }
-  if (url.includes("vimeo.com/")) {
-    const videoId = url.split("vimeo.com/")[1];
-    return `https://player.vimeo.com/video/${videoId}`;
-  }
-  return url; // fallback
-}
+};
 
 
-  useEffect(() => {
 
-    fetchCourses();
 
-  }, []);
 
   useEffect(() => {
   const fetchExamRooms = async () => {
@@ -145,51 +187,139 @@ const [supportForm, setSupportForm] = useState({
       console.error("Erro ao buscar cursos:", err);
     }
   };
+  fetchCourses();
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleVideoSave = async () => {
+
+const handleVideoSave = async () => {
   try {
-    // Gera o embedUrl a partir do link colado
+    // Gerar o embed a partir do link do vídeo
     const embedUrl = getEmbedUrl(videoForm.url);
 
-    // Cria o objeto que será enviado para o backend
+    // Validar os campos obrigatórios
+    if (
+      !videoForm.title?.trim() ||
+      !videoForm.tema?.trim() ||
+      !videoForm.disciplina?.trim() ||
+      !embedUrl ||
+      !videoForm.url_drive?.trim() ||
+      !videoForm.courseId
+    ) {
+      alert("Preenche todos os campos obrigatórios, incluindo o link do Google Drive.");
+      return;
+    }
+
+    // Dados enviados para o backend
     const videoData = {
-      title: videoForm.title,
-      tema: videoForm.tema,
-      disciplina: videoForm.disciplina,
-      courseId: videoForm.courseId,
-      url: embedUrl // já vai o embed pronto
+      title: videoForm.title.trim(),
+      tema: videoForm.tema.trim(),
+      disciplina: videoForm.disciplina.trim(),
+      courseId: Number(videoForm.courseId),
+      url: embedUrl,
+      url_drive: videoForm.url_drive.trim()
     };
 
-    const response = await fetch("http://localhost:5000/api/video-lessons", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${user.token}` // token do usuário
-      },
-      body: JSON.stringify(videoData),
+    const response = await fetch(
+      "http://localhost:5000/api/video-lessons",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`
+        },
+        body: JSON.stringify(videoData)
+      }
+    );
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      console.error("Erro da API:", response.status, data);
+
+      alert(
+        data.missingFields
+          ? `Preenche os seguintes campos: ${data.missingFields.join(", ")}`
+          : data.error || "Erro ao salvar vídeo aula."
+      );
+
+      return;
+    }
+
+    alert("Vídeo aula adicionada com sucesso!");
+
+    setShowVideoModal(false);
+
+    setVideoForm({
+      title: "",
+      tema: "",
+      disciplina: "",
+      url: "",
+      url_drive: "",
+      courseId: ""
     });
 
-    if (response.ok) {
-      alert("Vídeo aula adicionada com sucesso!");
-      setShowVideoModal(false);
-      setVideoForm({
-        title: "",
-        tema: "",
-        disciplina: "",
-        url: "",
-        courseId: ""
-      });
-    } else {
-      alert("Erro ao salvar vídeo aula!");
-    }
   } catch (error) {
-    console.error("Erro:", error);
+    console.error("Erro ao guardar vídeo aula:", error);
     alert("Erro de conexão com o servidor!");
   }
 };
 
+
+const openConfigModal = () => {
+  fetchCourses();
+
+  setConfigForm({
+    courseId: '',
+    supportWhatsapp: '',
+    paymentWhatsapp: '',
+  });
+
+  setShowConfigModal(true);
+};
+
+const handleConfigChange = (e) => {
+  const { name, value } = e.target;
+
+  setConfigForm((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+};
+
+const handleSaveConfig = async () => {
+  try {
+
+    const response = await fetch(
+      'http://localhost:5000/api/course-contacts',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(configForm)
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    setSaveSuccess(true);
+
+    setConfigForm({
+      courseId: '',
+      supportWhatsapp: '',
+      paymentWhatsapp: ''
+    });
+
+  } catch (error) {
+    console.error(error);
+    alert(error.message);
+  }
+};
 
 
   const handleSave = async () => {
@@ -440,6 +570,7 @@ const [supportForm, setSupportForm] = useState({
                 <NavDropdown.Item onClick={() => setShowSupportModal(true)}>Material de Apoio</NavDropdown.Item>
                 <NavDropdown.Item onClick={() => setShowComplementModal(true)}>Matéria Complementar</NavDropdown.Item>
                 <NavDropdown.Item onClick={() => setShowVideoModal(true)}>Video Aula</NavDropdown.Item>
+                <NavDropdown.Item onClick={() => openConfigModal(true)}>Adicionar WhatsApp</NavDropdown.Item>
                 <NavDropdown.Item onClick={() => navigate ("/")}>Página inicial →</NavDropdown.Item>
                 
                 
@@ -516,7 +647,7 @@ const [supportForm, setSupportForm] = useState({
 
       {/* NOVO CAMPO PAÍS */}
       <Form.Group className="mb-3">
-        <Form.Label>País</Form.Label>
+        <Form.Label>Província</Form.Label>
         <Form.Control name="country" value={form.country || ""} onChange={handleChange} />
       </Form.Group>
 
@@ -652,7 +783,14 @@ const [supportForm, setSupportForm] = useState({
     <option value="Matemática">Matemática</option>
     <option value="Física">Física</option>
     <option value="Língua Portuguesa">Língua Portuguesa</option>
+    <option value="Língua Francesa">Língua Francesa</option>
+    <option value="Língua Inglesa">Língua Inglesa</option>
+    <option value="Línguas Africanas">Línguas Africanas</option>
     <option value="Química">Química</option>
+    <option value="História">História</option>
+    <option value="Cultura Geral">Cultura Geral</option>
+    <option value="Geografia">Geografia</option>
+    <option value="Psicologia">Psicologia</option>
     
     {/* outras disciplinas */}
   </Form.Select>
@@ -720,11 +858,18 @@ const [supportForm, setSupportForm] = useState({
           onChange={handleSupportChange}
         >
           <option value="">Selecione uma disciplina</option>
-          <option value="Matemática">Matemática</option>
-          <option value="Língua Portuguesa">Língua Portuguesa</option>
-          <option value="Biologia">Biologia</option>
-          <option value="Física">Física</option>
-          <option value="Química">Química</option>
+    <option value="Biologia">Biologia</option>
+    <option value="Matemática">Matemática</option>
+    <option value="Física">Física</option>
+    <option value="Língua Portuguesa">Língua Portuguesa</option>
+    <option value="Língua Francesa">Língua Francesa</option>
+    <option value="Língua Inglesa">Língua Inglesa</option>
+    <option value="Línguas Africanas">Línguas Africanas</option>
+    <option value="Química">Química</option>
+    <option value="História">História</option>
+    <option value="Cultura Geral">Cultura Geral</option>
+    <option value="Geografia">Geografia</option>
+    <option value="Psicologia">Psicologia</option>
           {/* Adicione mais opções conforme necessário */}
         </Form.Select>
       </Form.Group>
@@ -791,11 +936,18 @@ const [supportForm, setSupportForm] = useState({
           onChange={handleComplementChange}
         >
           <option value="">Selecione uma disciplina</option>
-          <option value="Matemática">Matemática</option>
-          <option value="Língua Portuguesa">Língua Portuguesa</option>
-          <option value="Biologia">Biologia</option>
-          <option value="Física">Física</option>
-          <option value="Química">Química</option>
+    <option value="Biologia">Biologia</option>
+    <option value="Matemática">Matemática</option>
+    <option value="Física">Física</option>
+    <option value="Língua Portuguesa">Língua Portuguesa</option>
+    <option value="Língua Francesa">Língua Francesa</option>
+    <option value="Língua Inglesa">Língua Inglesa</option>
+    <option value="Línguas Africanas">Línguas Africanas</option>
+    <option value="Química">Química</option>
+    <option value="História">História</option>
+    <option value="Cultura Geral">Cultura Geral</option>
+    <option value="Geografia">Geografia</option>
+    <option value="Psicologia">Psicologia</option>
         </Form.Select>
       </Form.Group>
 
@@ -818,8 +970,145 @@ const [supportForm, setSupportForm] = useState({
   </Modal.Footer>
 </Modal>
 
+<Modal
+
+  show={showConfigModal}
+  onHide={() => {
+    setShowConfigModal(false);
+    setSaveSuccess(false);
+  }}
+  centered
+>
+  <Modal.Header closeButton className="bg-primary text-white">
+    <Modal.Title>
+      📞 Configuração de Contactos do Curso
+    </Modal.Title>
+  </Modal.Header>
+
+  <Modal.Body>
+   
+
+    <div className="alert alert-info">
+      Configure os contactos que serão exibidos aos alunos deste curso.
+    </div>
 
 
+
+    {saveSuccess && (
+      <div className="alert alert-success shadow-sm">
+        <strong>✅ Configuração salva com sucesso!</strong>
+        <br />
+        Os contactos foram vinculados ao curso e já estão disponíveis para utilização.
+      </div>
+
+    )}
+
+    <Form>
+
+      <Form.Group className="mb-4">
+        <Form.Label className="fw-bold">
+          🎓 Curso
+        </Form.Label>
+
+        <Form.Select
+          name="courseId"
+          value={configForm.courseId}
+          onChange={handleConfigChange}
+        >
+          <option value="">
+            Selecione um curso
+          </option>
+
+          {courses.map(c => (
+            <option
+              key={c.id}
+              value={c.id}
+            >
+              {c.title}
+            </option>
+          ))}
+        </Form.Select>
+      </Form.Group>
+
+      <div className="row">
+
+        <div className="col-md-6">
+
+          <Form.Group className="mb-3">
+            <Form.Label className="fw-bold text-success">
+              💬 WhatsApp de Dúvidas
+            </Form.Label>
+
+            <Form.Control
+              type="text"
+              name="supportWhatsapp"
+              value={configForm.supportWhatsapp}
+              onChange={handleConfigChange}
+              placeholder="link whatsapp"
+            />
+          </Form.Group>
+
+        </div>
+
+        <div className="col-md-6">
+
+          <Form.Group className="mb-3">
+            <Form.Label className="fw-bold text-warning">
+              💰 WhatsApp de Pagamentos
+            </Form.Label>
+
+            <Form.Control
+              type="text"
+              name="paymentWhatsapp"
+              value={configForm.paymentWhatsapp}
+              onChange={handleConfigChange}
+              placeholder="link whatsapp"
+            />
+          </Form.Group>
+
+        </div>
+
+      </div>
+
+      <div
+        className="p-3 rounded"
+        style={{
+          background: "#f8fafc",
+          border: "1px solid #e2e8f0"
+        }}
+      >
+        <small className="text-muted">
+          ℹ️ Os números configurados aqui serão utilizados para
+          suporte aos estudantes e orientações de pagamento.
+        </small>
+      </div>
+
+    </Form>
+
+  </Modal.Body>
+
+  <Modal.Footer>
+
+    <Button
+      variant="outline-secondary"
+      onClick={() => {
+        setShowConfigModal(false);
+        setSaveSuccess(false);
+      }}
+    >
+      Cancelar
+    </Button>
+
+    <Button
+      variant="success"
+      onClick={handleSaveConfig}
+    >
+      💾 Salvar Configuração
+    </Button>
+
+  </Modal.Footer>
+
+</Modal>
 <Modal show={showVideoModal} onHide={() => setShowVideoModal(false)}>
   <Modal.Header closeButton>
     <Modal.Title>Adicionar Vídeo Aula</Modal.Title>
@@ -859,47 +1148,99 @@ const [supportForm, setSupportForm] = useState({
           onChange={handleVideoChange}
         >
           <option value="">Selecione uma disciplina</option>
-          <option value="Matemática">Matemática</option>
-          <option value="Língua Portuguesa">Língua Portuguesa</option>
-          <option value="Biologia">Biologia</option>
-          <option value="Física">Física</option>
-          <option value="Química">Química</option>
+    <option value="Biologia">Biologia</option>
+    <option value="Matemática">Matemática</option>
+    <option value="Física">Física</option>
+    <option value="Língua Portuguesa">Língua Portuguesa</option>
+    <option value="Língua Francesa">Língua Francesa</option>
+    <option value="Língua Inglesa">Língua Inglesa</option>
+    <option value="Línguas Africanas">Línguas Africanas</option>
+    <option value="Química">Química</option>
+    <option value="História">História</option>
+    <option value="Cultura Geral">Cultura Geral</option>
+    <option value="Geografia">Geografia</option>
+    <option value="Psicologia">Psicologia</option>
         </Form.Select>
       </Form.Group>
 
-      {/* Campo URL do Vídeo */}
-      <Form.Group className="mb-3">
+      
+{/* Campo URL do Vídeo */}
+
+{/* Campo URL do Vídeo */}
+<Form.Group className="mb-3">
   <Form.Label>URL do Vídeo</Form.Label>
+
   <Form.Control
     type="text"
-    placeholder="Cole o link do vídeo (YouTube, Vimeo...)"
+    placeholder="Cole o link do YouTube Shorts, vídeo normal ou Vimeo"
     name="url"
     value={videoForm.url}
     onChange={handleVideoChange}
   />
 </Form.Group>
 
-{/* Pré-visualização do vídeo */}
-{videoForm.url && (
-  <div style={{ marginTop: "20px" }}>
-    <h6>Pré-visualização:</h6>
-    <div style={{ position: "relative", paddingBottom: "56.25%", height: 0 }}>
-      <iframe
-        src={getEmbedUrl(videoForm.url)}
-        frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%"
-        }}
-      ></iframe>
-    </div>
+{/* Pré-visualização */}
+{videoForm.url?.trim() && (
+  <div className="mb-3">
+    {getEmbedUrl(videoForm.url) ? (
+      <>
+        <Form.Label>Pré-visualização do Vídeo</Form.Label>
+
+        <div
+          className="ratio ratio-16x9"
+          style={{
+            backgroundColor: "#000",
+            borderRadius: "8px",
+            overflow: "hidden"
+          }}
+        >
+          <iframe
+            src={getEmbedUrl(videoForm.url)}
+            title="Pré-visualização do vídeo"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            style={{
+              width: "100%",
+              height: "100%",
+              border: 0
+            }}
+          />
+        </div>
+      </>
+    ) : (
+      <small className="text-danger">
+        Link inválido ou formato não suportado.
+        Verifique o URL do vídeo.
+      </small>
+    )}
   </div>
 )}
+
+
+{/* Pré-visualização do Vídeo */}
+
+
+
+
+
+{/* Campo URL do Google Drive */}
+<Form.Group className="mb-3">
+  <Form.Label>URL do Google Drive</Form.Label>
+
+  <Form.Control
+    type="text"
+    placeholder="Cole o link do vídeo no Google Drive"
+    name="url_drive"
+    value={videoForm.url_drive}
+    onChange={handleVideoChange}
+  />
+</Form.Group>
+
+{/* Botão para descarregar o vídeo */}
+
+
+
+
 
 
       {/* Campo Curso (opcional) */}

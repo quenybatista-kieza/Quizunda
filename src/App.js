@@ -5,9 +5,9 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 
 // Contextos e rotas protegidas
 import ProtectedRoute from './components/ProtectedRoute';       // estudantes/preparatório
-import ProtectedRoute_1 from './components/ProtectedRoute_1';   // administradores
+import ProtectedRoute1 from './components/ProtectedRoute1';   // administradores
 import { AuthProvider } from './context/AuthContext';           // estudantes/preparatório
-import { AdminAuthProvider } from './context/AuthContext_1';    // administradores
+import { AdminAuthProvider } from './context/AuthContext1';    // administradores
 
 // Páginas públicas
 import HomePage from './pages/HomePage';
@@ -26,8 +26,11 @@ import Banco from './pages/Banco';
 import Contato from './pages/Contato';
 import Sobre from './pages/Sobre';
 import RecuperarSenha from './pages/RecuperarSenha';
-import Senha_esquecida from './pages/Senha_esquecida';
+import SenhaEsquecida from './pages/SenhaEsquecida';
 import Mentoria from './pages/Mentoria';
+import ExamQuestions from './pages/ExamQuestions';
+import CourseContacts from './pages/CourseContacts';
+import ExamClasses from './pages/ExamClasses';
 
 
 // Páginas de administrador
@@ -62,9 +65,9 @@ function App() {
             <Route
               path="/AdminDashboard"
               element={
-                <ProtectedRoute_1 allowedUsers={['admin1']}>
+                <ProtectedRoute1 allowedUsers={['admin1']}>
                   <AdminDashboard />
-                </ProtectedRoute_1>
+                </ProtectedRoute1>
               }
             />
 
@@ -125,18 +128,45 @@ function App() {
             <Route
               path="/DestacarCurso"
               element={
-                <ProtectedRoute_1 allowedUsers={['admin1']}>
+                <ProtectedRoute1 allowedUsers={['admin1']}>
                   <DestacarCurso />
-                </ProtectedRoute_1>
+                </ProtectedRoute1>
               }
             />
 
             <Route
-              path="/Senha_esquecida"
+              path="/ExamQuestions"
               element={
-                <ProtectedRoute_1 allowedUsers={['admin1']}>
-                  <Senha_esquecida />
-                </ProtectedRoute_1>
+                <ProtectedRoute1 allowedUsers={['admin1']}>
+                  <ExamQuestions />
+                </ProtectedRoute1>
+              }
+            />
+
+            <Route
+              path="/CourseContacts"
+              element={
+                <ProtectedRoute1 allowedUsers={['admin1']}>
+                  <CourseContacts />
+                </ProtectedRoute1>
+              }
+            />
+
+            <Route
+              path="/ExamClasses"
+              element={
+                <ProtectedRoute1 allowedUsers={['admin1']}>
+                  <ExamClasses />
+                </ProtectedRoute1>
+              }
+            />
+
+            <Route
+              path="/SenhaEsquecida"
+              element={
+                <ProtectedRoute1 allowedUsers={['admin1']}>
+                  <SenhaEsquecida />
+                </ProtectedRoute1>
               }
             />
             
@@ -145,34 +175,34 @@ function App() {
             <Route
               path="/ValidarCompra"
               element={
-                <ProtectedRoute_1 allowedUsers={['admin1']}>
+                <ProtectedRoute1 allowedUsers={['admin1']}>
                   <ValidarCompra />
-                </ProtectedRoute_1>
+                </ProtectedRoute1>
               }
             />
             <Route
               path="/AtualizarVersiculos"
               element={
-                <ProtectedRoute_1 allowedUsers={['admin1']}>
+                <ProtectedRoute1 allowedUsers={['admin1']}>
                   <AtualizarVersiculos />
-                </ProtectedRoute_1>
+                </ProtectedRoute1>
               }
             />
             
             <Route
               path="/GerenciarCurso"
               element={
-                <ProtectedRoute_1 allowedUsers={['admin1']}>
+                <ProtectedRoute1 allowedUsers={['admin1']}>
                   <GerenciarCurso />
-                </ProtectedRoute_1>
+                </ProtectedRoute1>
               }
             />
             <Route
               path="/GerenciarUsuarios"
               element={
-                <ProtectedRoute_1 allowedUsers={['admin1']}>
+                <ProtectedRoute1 allowedUsers={['admin1']}>
                   <GerenciarUsuarios />
-                </ProtectedRoute_1>
+                </ProtectedRoute1>
               }
             />
 

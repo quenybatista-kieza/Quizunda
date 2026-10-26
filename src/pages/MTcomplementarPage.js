@@ -10,19 +10,38 @@ export default function MTcomplementarPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchMaterials = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/materials");
-        if (response.ok) {
-          const data = await response.json();
-          setMaterials(data);
+  const fetchMaterials = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        "http://localhost:5000/api/materials",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
-      } catch (error) {
-        console.error("Erro ao buscar materiais:", error);
+      );
+
+      const data = await response.json();
+
+      console.log("Materiais recebidos:", data);
+
+      if (response.ok) {
+        setMaterials(Array.isArray(data) ? data : []);
+      } else {
+        console.error("Erro da API:", data);
+        setMaterials([]);
       }
-    };
-    fetchMaterials();
-  }, []);
+    } catch (error) {
+      console.error("Erro ao buscar materiais:", error);
+      setMaterials([]);
+    }
+  };
+
+  fetchMaterials();
+}, []);
 
   const handleShow = (material) => {
     setSelectedMaterial(material);
@@ -40,10 +59,10 @@ export default function MTcomplementarPage() {
       <Row className="align-items-center mb-4">
         <Col xs="auto">
           <img
-            src="/urnm.png"
+            src="/chapeu.png"
             alt="Logo"
-            width="60"
-            height="60"
+            width="80"
+            height="80"
             style={{ objectFit: "contain" }}
           />
         </Col>

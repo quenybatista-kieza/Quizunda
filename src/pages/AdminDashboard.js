@@ -72,7 +72,7 @@ export default function AdminDashboard() {
       const decoded = jwtDecode(adminData.token);
 
       if (decoded.username === "admin1") {
-        navigate("/Senha_esquecida");
+        navigate("/SenhaEsquecida");
       } else {
         alert("Acesso permitido apenas para admin1!");
         navigate("/unauthorized");
@@ -105,6 +105,77 @@ export default function AdminDashboard() {
       navigate("/AdminLogin");
     }
   };
+
+  const handleClick_sp = () => {
+    const savedAdmin = localStorage.getItem("adminUser");
+    if (!savedAdmin) {
+      alert("Você precisa estar logado como admin1!");
+      return navigate("/AdminLogin");
+    }
+
+    try {
+      const adminData = JSON.parse(savedAdmin);
+      const decoded = jwtDecode(adminData.token);
+
+      if (decoded.username === "admin1") {
+        navigate("/ExamQuestions");
+      } else {
+        alert("Acesso permitido apenas para admin1!");
+        navigate("/unauthorized");
+      }
+    } catch (err) {
+      alert("Token inválido ou expirado. Faça login novamente.");
+      navigate("/AdminLogin");
+    }
+  };
+
+  const handleClick_ec = () => {
+    const savedAdmin = localStorage.getItem("adminUser");
+    if (!savedAdmin) {
+      alert("Você precisa estar logado como admin1!");
+      return navigate("/AdminLogin");
+    }
+
+    try {
+      const adminData = JSON.parse(savedAdmin);
+      const decoded = jwtDecode(adminData.token);
+
+      if (decoded.username === "admin1") {
+        navigate("/ExamClasses");
+      } else {
+        alert("Acesso permitido apenas para admin1!");
+        navigate("/unauthorized");
+      }
+    } catch (err) {
+      alert("Token inválido ou expirado. Faça login novamente.");
+      navigate("/AdminLogin");
+    }
+  };
+
+  const handleClick_aw = () => {
+    const savedAdmin = localStorage.getItem("adminUser");
+    if (!savedAdmin) {
+      alert("Você precisa estar logado como admin1!");
+      return navigate("/AdminLogin");
+    }
+
+    try {
+      const adminData = JSON.parse(savedAdmin);
+      const decoded = jwtDecode(adminData.token);
+
+      if (decoded.username === "admin1") {
+        navigate("/CourseContacts");
+      } else {
+        alert("Acesso permitido apenas para admin1!");
+        navigate("/unauthorized");
+      }
+    } catch (err) {
+      alert("Token inválido ou expirado. Faça login novamente.");
+      navigate("/AdminLogin");
+    }
+  };
+
+
 
   //para gerenciar usuario
 
@@ -180,6 +251,15 @@ export default function AdminDashboard() {
             </Button>
             <Button variant="warning" className="w-100 text-dark" onClick={handleClick_d}>
               Destacar Cursos
+            </Button>
+            <Button variant="danger" className="w-100 text-dark" onClick={handleClick_sp}>
+              Perguntas e Salas
+            </Button>
+            <Button variant="warning" className="w-100 text-dark" onClick={handleClick_aw}>
+              Atualizar WhatsApp
+            </Button>
+            <Button variant="success" className="w-100 text-dark" onClick={handleClick_ec}>
+              Salas de Exame
             </Button>
             <Button variant="outline-success" className="w-100" onClick={handleClick_vc}>
               Validar Compra

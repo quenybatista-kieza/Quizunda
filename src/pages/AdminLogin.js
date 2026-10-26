@@ -2,7 +2,7 @@
 import React, { useState, useContext } from "react";
 import { Form, Button, Card, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { AdminAuthContext } from "../context/AuthContext_1"; // importa o contexto de admin
+import { AdminAuthContext } from "../context/AuthContext1"; // importa o contexto de admin
 
 export default function AdminLogin() {
   const [username, setUsername] = useState("");

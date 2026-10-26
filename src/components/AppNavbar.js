@@ -25,9 +25,9 @@ export default function AppNavbar({ onFilterByCountry }) {
         {/* Logo à esquerda */}
         <Navbar.Brand href="/">
           <img
-            src="/urnm.png"
-            width="50"
-            height="50"
+            src="/chapeu.png"
+            width="80"
+            height="80"
             className="d-inline-block align-top"
             alt="Logo"
           />
@@ -40,33 +40,14 @@ export default function AppNavbar({ onFilterByCountry }) {
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
           {/* Botão Voltar */}
           <Button
-            variant="secondary"
+            variant="warning"
             className="me-3"
             href="/"
             style={{ fontWeight: "bold" }}
           >
             Voltar
           </Button>
-          <NavDropdown
-            title="Filtrar Cursos"
-            id="courses-filter-dropdown"
-            align="end"
-          >
-            {countries.length > 0 ? (
-              countries.map((country) => (
-                <NavDropdown.Item
-                  key={country.id}
-                  onClick={() => onFilterByCountry(country.country)}
-                >
-                  {country.country}
-                </NavDropdown.Item>
-              ))
-            ) : (
-              <NavDropdown.Item disabled>
-                Nenhum país disponível
-              </NavDropdown.Item>
-            )}
-          </NavDropdown>
+          
         </Navbar.Collapse>
       </Container>
     </Navbar>

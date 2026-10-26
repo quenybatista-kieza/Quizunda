@@ -82,10 +82,10 @@ function HomePage() {
   <Container>
     <Navbar.Brand href="/">
       <img
-        src="/urnm.png"
+        src="/chapeu.png"
         alt="Bandeira de Angola"
-        width="60"
-        height="60"
+        width="80"
+        height="80"
         className="d-inline-block align-top"
       />
     </Navbar.Brand>
@@ -126,7 +126,7 @@ function HomePage() {
                 <NavDropdown.Item href="/CoursesPage">Cursos</NavDropdown.Item>
                 
                 <NavDropdown.Item href="/contato">Cotacto</NavDropdown.Item>
-                <NavDropdown.Item href="/Mentoria">Mentoria</NavDropdown.Item>
+                
                 <NavDropdown.Item href="/sobre">Sobre Nós</NavDropdown.Item>
                 
                 
@@ -368,11 +368,11 @@ function HomePage() {
   </div>
   <div className="menu-card" style={{ backgroundColor: "#dcdcdc" }}>
     <img src="/mandume.png" alt="Universidade 2" className="university-logo" />
-    <p className="university-name">Universidade Mandume Ya Ndemufayo</p>
+    <p className="university-name">Universidade Mandume Ya Ndemufayo(UMYN)</p>
   </div>
   <div className="menu-card" style={{ backgroundColor: "#dcdcdc" }}>
     <img src="/unikiv.png" alt="Universidade 3" className="university-logo" />
-    <p className="university-name">Universidade Kimpa Vita</p>
+    <p className="university-name">Universidade Kimpa Vita (UNIKIV)</p>
   </div>
   <div className="menu-card" style={{ backgroundColor: "#dcdcdc" }}>
     <img src="/uan.png" alt="Universidade 4" className="university-logo" />
