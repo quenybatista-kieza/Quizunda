@@ -1,0 +1,221 @@
+```css
+.sobre-page {
+  background: #f8fafc;
+  min-height: 100vh;
+  padding-bottom: 70px;
+  color: #0f172a;
+}
+
+.sobre-hero {
+  background: linear-gradient(125deg, #0b1228 0%, #172554 55%, #1d4ed8 100%);
+  color: #fff;
+  padding: 70px 0;
+  border-radius: 0 0 36px 36px;
+  position: relative;
+  overflow: hidden;
+}
+
+.sobre-foto {
+  width: 230px;
+  height: 230px;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 50%;
+  border: 5px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.sobre-foto:hover {
+  transform: scale(1.035);
+}
+
+.sobre-indicador {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.sobre-indicador.ativo {
+  width: 28px;
+  border-radius: 20px;
+  background: #60a5fa !important;
+}
+
+.sobre-botao {
+  background: #fff !important;
+  color: #1d4ed8 !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  padding: 13px 22px !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sobre-botao:hover {
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.sobre-etiqueta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  padding: 8px 13px;
+  border-radius: 30px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.sobre-card {
+  height: 100%;
+  border: 1px solid #e8edf5 !important;
+  border-radius: 22px !important;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 5px 22px rgba(15, 23, 42, 0.045);
+  transition: transform 0.3s ease, box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.sobre-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.09);
+  border-color: #cbd5e1 !important;
+}
+
+.sobre-card-historia {
+  border-top: 4px solid #2563eb !important;
+}
+
+.sobre-icone {
+  width: 58px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 17px;
+  flex-shrink: 0;
+}
+
+.sobre-numero {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.sobre-descricao {
+  color: #64748b;
+  line-height: 1.85;
+  font-size: 0.96rem;
+  margin: 0;
+}
+
+.sobre-titulo-card {
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  margin: 0;
+  color: #0f172a;
+}
+
+.sobre-hero-titulo {
+  font-size: 2.7rem;
+  font-weight: 900;
+  letter-spacing: -1.2px;
+}
+
+.sobre-seccao {
+  padding-top: 65px;
+}
+
+.sobre-seccao-titulo {
+  font-weight: 900;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  letter-spacing: -1px;
+  margin: 20px 0 12px;
+}
+
+.sobre-texto-introdutorio {
+  max-width: 620px;
+  margin: 0 auto;
+  color: #64748b;
+  line-height: 1.8;
+}
+
+.sobre-chamada {
+  margin-top: 55px;
+  padding: 30px 15px;
+  text-align: center;
+}
+
+.sobre-chamada-titulo {
+  font-weight: 800;
+  font-size: 1.45rem;
+  margin-bottom: 12px;
+}
+
+.sobre-chamada-texto {
+  color: #64748b;
+  line-height: 1.8;
+  max-width: 580px;
+  margin: 0 auto 22px;
+}
+
+.sobre-botao-principal {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 13px 24px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
+}
+
+@media (max-width: 767px) {
+  .sobre-hero {
+    padding: 48px 0;
+    border-radius: 0 0 26px 26px;
+  }
+
+  .sobre-foto {
+    width: 165px;
+    height: 165px;
+    margin-bottom: 28px;
+  }
+
+  .sobre-hero-titulo {
+    font-size: 2rem;
+  }
+
+  .sobre-descricao {
+    font-size: 0.93rem;
+  }
+
+  .sobre-card {
+    border-radius: 18px !important;
+  }
+
+  .sobre-seccao {
+    padding-top: 42px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sobre-card,
+  .sobre-foto,
+  .sobre-botao {
+    transition: none;
+  }
+}
+```

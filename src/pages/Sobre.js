@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   Container,
@@ -5,336 +6,343 @@ import {
   Col,
   Card,
   Button,
-  Carousel,
 } from "react-bootstrap";
+
 import {
-  FaStethoscope,
-  FaLaptopCode,
   FaBullseye,
   FaEye,
   FaHeart,
-  FaUsers,
   FaBookOpen,
+  FaArrowRight,
 } from "react-icons/fa";
 
-
-
-
-export default function SobreNos() {
-
-  const pessoas = [
+const pessoas = [
   {
     foto: "/QJ.jpeg",
     nome: "Batista Do Rosário Da Silva Quizunda",
     cargo: "Fundador e Desenvolvedor",
     descricao:
-      "Estudante do 2º ano da Faculdadde de Medicina da Universidade Rainha Njinga Mbande e desenvolvedor de software. Criador da Plataforma Kieza, com foco em educação digital, inovação tecnológica e preparação académica de qualidade.",
+      "Estudante do 2.º ano da Faculdade de Medicina da Universidade Rainha Njinga Mbande e desenvolvedor de software. Criador da Plataforma Kieza, com foco na educação digital, inovação tecnológica e preparação académica de qualidade.",
   },
   {
     foto: "/gel.jpg",
-    nome: "Gelson Teodor Pedro Quindua",
+    nome: "Gelson Teodoro Pedro Quindua",
     cargo: "Desenvolvedor de Software e Game Dev",
     descricao:
-      "Contribuidor, e por suas habilidades mostrou-se disponivel a compartilhar o seu conhecimento como prova de inovação, e desenvolvimento para a preparação adequada dos estudantes a nível nacional.",
+      "Contribui para o desenvolvimento tecnológico da Kieza, partilhando conhecimentos e competências para promover a inovação e melhorar a preparação académica dos estudantes.",
   },
   {
     foto: "/Logótipo Baoba CTI_ Árvore Tecnológica.png",
     nome: "Baoba C.T.I",
     cargo: "Empresa Apoiadora",
     descricao:
-      "A Baoba CTI é uma Startup, focada em Ciência,Tecnologia e Inovação tendo se identificado com o propósito da plataforma Kieza, acordou como sendo a principal empresa apoiadora da plataforma. ",
+      "Startup dedicada à Ciência, Tecnologia e Inovação, que se identificou com o propósito da Kieza e assumiu o papel de principal empresa apoiadora da plataforma.",
   },
 ];
 
-const [activeIndex, setActiveIndex] = React.useState(0);
+const cards = [
+  {
+    numero: "01",
+    titulo: "A Nossa História",
+    subtitulo: "Como tudo começou",
+    icon: FaBookOpen,
+    cor: "#2563eb",
+    fundo: "#eff6ff",
+    destaque: true,
+    descricao:
+      "A Kieza nasceu da necessidade de tornar a preparação académica mais acessível, organizada e eficiente para os estudantes. Idealizada por Batista do Rosário da Silva Quizunda, a plataforma surgiu da união entre a experiência académica e a paixão pela tecnologia, com o propósito de ajudar jovens a superar desafios e alcançar os seus objetivos. Através de materiais educativos, videoaulas e exames simulados, trabalhamos para transformar a forma como os estudantes aprendem e se preparam para o futuro.",
+  },
+  {
+    numero: "02",
+    titulo: "Missão",
+    subtitulo: "O que nos move",
+    icon: FaBullseye,
+    cor: "#059669",
+    fundo: "#ecfdf5",
+    destaque: false,
+    descricao:
+      "Democratizar o acesso ao conhecimento através da tecnologia, disponibilizando recursos educativos de qualidade que apoiem a aprendizagem e a preparação académica dos estudantes.",
+  },
+  {
+    numero: "03",
+    titulo: "Visão",
+    subtitulo: "Onde queremos chegar",
+    icon: FaEye,
+    cor: "#7c3aed",
+    fundo: "#f5f3ff",
+    destaque: false,
+    descricao:
+      "Tornar a Kieza uma referência nacional em educação digital e preparação académica, contribuindo para um futuro em que cada estudante tenha melhores oportunidades de aprendizagem.",
+  },
+  {
+    numero: "04",
+    titulo: "Os Nossos Valores",
+    subtitulo: "Aquilo em que acreditamos",
+    icon: FaHeart,
+    cor: "#e11d48",
+    fundo: "#fff1f2",
+    destaque: false,
+    descricao:
+      "Guiamo-nos pela ética, inovação, compromisso, acessibilidade e qualidade. Acreditamos que a tecnologia deve servir as pessoas e que cada estudante merece ferramentas que incentivem o seu crescimento e sucesso.",
+  },
+];
 
-React.useEffect(() => {
-  const interval = setInterval(() => {
-    setActiveIndex((prev) => (prev + 1) % pessoas.length);
-  }, 5000);
+export default function SobreNos() {
+  const [activeIndex, setActiveIndex] = React.useState(0);
 
-  return () => clearInterval(interval);
-}, []);
+  const pessoa = pessoas[activeIndex];
 
-const pessoa = pessoas[activeIndex];
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % pessoas.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div
-      style={{
-        background: "#f8fafc",
-        minHeight: "100vh",
-        paddingBottom: "50px",
-      }}
-    >
+    <>
+      {/* Apresentação */}
+      <section
+        className="py-5"
+        style={{
+          background:
+            "linear-gradient(135deg, #0f172a 0%, #172554 55%, #1e3a8a 100%)",
+          color: "#fff",
 
-    <div
-  style={{
-    background: "linear-gradient(135deg, #0f172a, #2563eb)",
-    color: "white",
-    padding: "60px 20px",
-    borderRadius: "0 0 30px 30px",
-  }}
->
-  <Container>
-    <Row className="align-items-center">
-      <Col md={4} className="text-center">
-        <img
-          key={pessoa.foto}
-          src={pessoa.foto}
-          alt={pessoa.nome}
-          style={{
-            width: "260px",
-            height: "260px",
-            borderRadius: "50%",
-            objectFit: "cover",
-            objectPosition: "top",
-            border: "6px solid white",
-            boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
-            transition: "all 0.8s ease-in-out",
-          }}
-        />
-      </Col>
+        }}
+      >
+        <Container>
+          <Row className="align-items-center g-5">
+            <Col md={4} className="text-center">
+              <div
+                className="mx-auto rounded-4 overflow-hidden shadow-lg"
+                style={{
+                  maxWidth: "320px",
+                  border: "3px solid rgba(147,197,253,.5)",
+                  background: "#fff",
+                }}
+              >
+                
+              <img
+                key={pessoa.foto}
+                src={pessoa.foto}
+                alt={pessoa.nome}
+                className="img-fluid w-100"
+                style={{
+                  height: "320px",
+                  objectFit: "cover",
+                  objectPosition: "center 20%",
+                  display: "block",
+                }}
+              />
 
-      <Col md={8}>
-        <h1
-          style={{
-            fontWeight: "800",
-            marginBottom: "20px",
-          }}
-        >
-          Sobre a Plataforma Kieza
-        </h1>
+              </div>
 
-        <h3 style={{ color: "#93c5fd" }}>
-          {pessoa.nome}
-        </h3>
+              <div className="d-flex justify-content-center gap-2 mt-4">
+                {pessoas.map((item, index) => (
+                  <Button
+                    key={item.nome}
+                    type="button"
+                    variant="light"
+                    onClick={() => setActiveIndex(index)}
+                    aria-label={"Ver perfil de " + item.nome}
+                    aria-pressed={activeIndex === index}
+                    className="rounded-pill p-0 border-0"
+                    style={{
+                      width: activeIndex === index ? "32px" : "10px",
+                      height: "10px",
+                      background:
+                        activeIndex === index
+                          ? "#60a5fa"
+                          : "rgba(255,255,255,.4)",
+                      transition: "width .3s ease",
+                    }}
+                  />
+                ))}
+              </div>
+            </Col>
 
-        <h5
-          style={{
-            color: "#dbeafe",
-            marginBottom: "20px",
-          }}
-        >
-          {pessoa.cargo}
-        </h5>
+            <Col md={8}>
+              <span
+                className="text-uppercase fw-bold"
+                style={{
+                  color: "#93c5fd",
+                  fontSize: ".8rem",
+                  letterSpacing: "2px",
+                }}
+              >
+                Educação · Tecnologia · Futuro
+              </span>
 
-        <p
-          style={{
-            fontSize: "1.15rem",
-            lineHeight: "1.8",
-            minHeight: "120px",
-          }}
-        >
-          {pessoa.descricao}
-        </p>
+              <h1 className="display-5 fw-bold mt-3 mb-4">
+                Sobre a Plataforma Kieza
+              </h1>
 
-        {/* Indicadores */}
-        <div className="d-flex gap-2 mt-3 mb-4">
-          {pessoas.map((_, index) => (
-            <span
-              key={index}
-              onClick={() => setActiveIndex(index)}
-              style={{
-                width: "14px",
-                height: "14px",
-                borderRadius: "50%",
-                background:
-                  activeIndex === index
-                    ? "#22c55e"
-                    : "rgba(255,255,255,0.4)",
-                cursor: "pointer",
-                transition: "0.3s",
-              }}
-            />
-          ))}
+              <h2
+                className="h4 fw-bold mb-2"
+                style={{ color: "#bfdbfe" }}
+              >
+                {pessoa.nome}
+              </h2>
+
+              <p
+                className="fw-semibold mb-3"
+                style={{ color: "#93c5fd" }}
+              >
+                {pessoa.cargo}
+              </p>
+
+              <p
+                className="mb-4"
+                style={{
+                  color: "#e2e8f0",
+                  fontSize: "1rem",
+                  lineHeight: 1.9,
+                }}
+              >
+                {pessoa.descricao}
+              </p>
+
+              <Button
+                href="/"
+                variant="primary"
+                size="lg"
+                className="rounded-pill px-4 py-2 fw-semibold"
+              >
+                Voltar à página inicial
+                <FaArrowRight className="ms-2" size={13} />
+              </Button>
+            </Col>
+          </Row>
+        </Container>
+      </section>
+
+      {/* História, missão, visão e valores */}
+      <Container className="py-5">
+        <div className="text-center mb-5 mx-auto" style={{ maxWidth: "750px" }}>
+          <span
+            className="badge rounded-pill px-3 py-2 mb-3"
+            style={{
+              background: "#dbeafe",
+              color: "#1d4ed8",
+              letterSpacing: "1px",
+            }}
+          >
+            QUEM SOMOS
+          </span>
+
+          <h2 className="display-6 fw-bold mb-3">
+            Conheça a essência da Kieza
+          </h2>
+
+          <p className="text-secondary fs-5">
+            Mais do que uma plataforma, somos um projeto que une educação e
+            tecnologia para criar melhores oportunidades de aprendizagem.
+          </p>
         </div>
 
-        <Button
-          href="/"
-          size="lg"
-          style={{
-            background:
-              "linear-gradient(135deg,#22c55e,#16a34a)",
-            border: "none",
-            borderRadius: "12px",
-            fontWeight: "700",
-          }}
-        >
-          Voltar à Página Inicial
-        </Button>
-      </Col>
-    </Row>
-  </Container>
-</div>
-     
-      <Container className="mt-5">
+        <Row className="g-4">
+          {cards.map((item) => {
+            const Icone = item.icon;
 
-        {/* HISTÓRIA */}
-        <Row className="mt-5">
-          <Col>
-            <Card className="border-0 shadow-lg">
-              <Card.Body className="p-5">
-                <h2
-                  className="text-center mb-4"
-                  style={{ fontWeight: "700" }}
-                >
-                  A Nossa História
-                </h2>
-
-                <p
+            return (
+              <Col
+                xs={12}
+                md={item.destaque ? 12 : 4}
+                key={item.numero}
+              >
+                <Card
+                  className="h-100 rounded-4 overflow-hidden"
                   style={{
-                    lineHeight: "2",
-                    fontSize: "1.05rem",
-                    color: "#444",
+                    border: item.destaque
+                      ? "1px solid #bfdbfe"
+                      : "1px solid #e2e8f0",
+                    borderTop: "4px solid " + item.cor,
+                    boxShadow: item.destaque
+                      ? "0 12px 35px rgba(37,99,235,.10)"
+                      : "0 6px 22px rgba(15,23,42,.06)",
+                    transition: "transform .2s ease, box-shadow .2s ease",
                   }}
                 >
-                  A Kieza surgiu da necessidade de oferecer aos estudantes
-                  uma plataforma moderna de apoio académico. O projecto
-                  combina tecnologia e educação para disponibilizar
-                  materiais complementares, videoaulas, exames simulados e
-                  ferramentas de aprendizagem acessíveis a qualquer momento.
+                  <Card.Body className={item.destaque ? "p-4 p-md-5" : "p-4"}>
+                    <Row className="align-items-start g-3">
+                      <Col xs="auto">
+                        <div
+                          className="d-flex align-items-center justify-content-center rounded-4"
+                          style={{
+                            background: item.fundo,
+                            color: item.cor,
+                            width: item.destaque ? "68px" : "58px",
+                            height: item.destaque ? "68px" : "58px",
+                          }}
+                        >
+                          <Icone size={item.destaque ? 29 : 24} />
+                        </div>
+                      </Col>
 
-                  O objectivo principal é ajudar jovens a alcançarem os seus
-                  sonhos académicos através de uma preparação eficiente,
-                  organizada e acessível.
-                </p>
-              </Card.Body>
-            </Card>
-          </Col>
+                      <Col>
+                        <div className="small fw-bold text-secondary mb-2">
+                          {item.numero} / 04
+                        </div>
+
+                        <h3 className={item.destaque ? "h3 fw-bold mb-2" : "h5 fw-bold mb-2"}>
+                          {item.titulo}
+                        </h3>
+
+                        <p
+                          className="small fw-bold mb-3"
+                          style={{ color: item.cor }}
+                        >
+                          {item.subtitulo}
+                        </p>
+
+                        <Card.Text
+                          className="text-secondary mb-0"
+                          style={{ lineHeight: 1.85 }}
+                        >
+                          {item.descricao}
+                        </Card.Text>
+                      </Col>
+                    </Row>
+                  </Card.Body>
+                </Card>
+              </Col>
+            );
+          })}
         </Row>
 
-        {/* MISSÃO VISÃO VALORES */}
-        <Row className="mt-5 g-4">
+        {/* Chamada final */}
+        <div
+          className="text-center rounded-4 p-4 p-md-5 mt-5"
+          style={{
+            background: "linear-gradient(135deg, #eff6ff, #f8fafc)",
+            border: "1px solid #dbeafe",
+          }}
+        >
+          <h3 className="h3 fw-bold mb-3">
+            O teu futuro começa com conhecimento.
+          </h3>
 
-          <Col md={4}>
-            <Card className="h-100 border-0 shadow">
-              <Card.Body className="text-center p-4">
-                <FaBullseye
-                  size={50}
-                  color="#2563eb"
-                  className="mb-3"
-                />
+          <p
+            className="text-secondary mx-auto mb-4"
+            style={{ maxWidth: "600px", lineHeight: 1.8 }}
+          >
+            Descobre os recursos da Kieza e dá o próximo passo na tua
+            preparação académica.
+          </p>
 
-                <h4>Missão</h4>
-
-                <p>
-                  Democratizar o acesso ao conhecimento através da
-                  tecnologia e de conteúdos educativos de qualidade.
-                </p>
-              </Card.Body>
-            </Card>
-          </Col>
-
-          <Col md={4}>
-            <Card className="h-100 border-0 shadow">
-              <Card.Body className="text-center p-4">
-                <FaEye
-                  size={50}
-                  color="#22c55e"
-                  className="mb-3"
-                />
-
-                <h4>Visão</h4>
-
-                <p>
-                  Tornar-se uma referência nacional em preparação
-                  académica digital para estudantes angolanos.
-                </p>
-              </Card.Body>
-            </Card>
-          </Col>
-
-          <Col md={4}>
-            <Card className="h-100 border-0 shadow">
-              <Card.Body className="text-center p-4">
-                <FaHeart
-                  size={50}
-                  color="#ef4444"
-                  className="mb-3"
-                />
-
-                <h4>Valores</h4>
-
-                <p>
-                  Ética, compromisso, inovação, acessibilidade e foco
-                  permanente no sucesso dos estudantes.
-                </p>
-              </Card.Body>
-            </Card>
-          </Col>
-
-        </Row>
-
-        {/* PERFIL */}
-        <Row className="mt-5">
-          <Col md={6}>
-            <Card className="border-0 shadow h-100">
-              <Card.Body className="text-center p-4">
-                <FaStethoscope
-                  size={55}
-                  color="#16a34a"
-                  className="mb-3"
-                />
-
-                <h4>Área Académica</h4>
-
-                <p>
-                  Estudante do 2º ano de Medicina com paixão pela
-                  aprendizagem contínua e desenvolvimento pessoal.
-                </p>
-              </Card.Body>
-            </Card>
-          </Col>
-
-          <Col md={6}>
-            <Card className="border-0 shadow h-100">
-              <Card.Body className="text-center p-4">
-                <FaLaptopCode
-                  size={55}
-                  color="#2563eb"
-                  className="mb-3"
-                />
-
-                <h4>Desenvolvimento de Software</h4>
-
-                <p>
-                  Programador focado em soluções web modernas para
-                  educação, gestão académica e transformação digital.
-                </p>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-
-        {/* ESTATÍSTICAS */}
-        <Row className="mt-5 text-center g-4">
-
-          <Col md={4}>
-            <Card className="border-0 shadow p-4">
-              <FaBookOpen size={45} color="#f59e0b" />
-              <h2 className="mt-3">+100</h2>
-              <p>Materiais Educativos</p>
-            </Card>
-          </Col>
-
-          <Col md={4}>
-            <Card className="border-0 shadow p-4">
-              <FaUsers size={45} color="#2563eb" />
-              <h2 className="mt-3">100%</h2>
-              <p>De foco na Impactação</p>
-            </Card>
-          </Col>
-
-          <Col md={4}>
-            <Card className="border-0 shadow p-4">
-              <FaBullseye size={45} color="#22c55e" />
-              <h2 className="mt-3">100%</h2>
-              <p>Foco na Qualidade</p>
-            </Card>
-          </Col>
-
-        </Row>
+          <Button
+            href="/"
+            variant="primary"
+            size="lg"
+            className="rounded-pill px-4 fw-semibold"
+          >
+            Explorar a Kieza
+            <FaArrowRight className="ms-2" size={13} />
+          </Button>
+        </div>
       </Container>
-    </div>
+    </>
   );
 }

@@ -38,7 +38,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 
 import DestacarCurso from "./pages/DestacarCurso";
 
-import AtualizarVersiculos from "./pages/AtualizarVersiculos";
+
 
 import ValidarCompra from "./pages/ValidarCompra";
 import GerenciarUsuarios from "./pages/GerenciarUsuarios";
@@ -180,14 +180,7 @@ function App() {
                 </ProtectedRoute1>
               }
             />
-            <Route
-              path="/AtualizarVersiculos"
-              element={
-                <ProtectedRoute1 allowedUsers={['admin1']}>
-                  <AtualizarVersiculos />
-                </ProtectedRoute1>
-              }
-            />
+           
             
             <Route
               path="/GerenciarCurso"

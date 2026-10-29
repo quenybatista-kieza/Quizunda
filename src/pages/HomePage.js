@@ -304,53 +304,7 @@ function HomePage() {
     </Container>
 
 
-      <Container className="mt-4">
-      <h2>Notícias</h2>
-      <p>Veja as novidades da nossa plataforma.</p>
-
-      {error && <Alert variant="danger">{error}</Alert>}
-
-      <Row>
-        {/* Renderizar cards de notícias */}
-        
-
-        {/* Renderizar cards de versículos */}
-        {versiculos.map((v) => (
-          <Col md={6} key={v.id} className="mb-3">
-  <Card
-    className="h-100 shadow-sm"
-    style={{ backgroundColor: "#d2b48c" }} // castanho claro (tan)
-  >
-    <Card.Body>
-      <Card.Title>Versículo</Card.Title>
-      <Card.Text
-        style={{
-          fontFamily: "'Georgia', 'Times New Roman', serif", // fonte clássica para textos bíblicos
-          fontStyle: "italic", // deixa mais estilizado
-          fontSize: "1.4rem", // levemente maior para destaque
-          lineHeight: "1.6", // espaçamento confortável
-          color: "#3e2723" // tom castanho escuro para contraste
-        }}
-      >
-        {v.versos}
-      </Card.Text>
-    </Card.Body>
-  </Card>
-</Col>
-        ))}
-
-        {noticias.map((n) => (
-          <Col md={6} key={n.id} className="mb-3" >
-            <Card className="h-100 shadow-sm" style={{ backgroundColor: "#d1ecf1" , fontSize: "1.2rem"}}>
-              <Card.Body>
-                <Card.Title>Notícia</Card.Title>
-                <Card.Text>{n.notice}</Card.Text>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-    </Container>
+      
       {/* Área Universidades */}
 <Container className="mt-5 text-center">
   <h2 className="section-title">
