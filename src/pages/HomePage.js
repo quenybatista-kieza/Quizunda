@@ -49,20 +49,6 @@ function HomePage() {
       .catch(() => setError("Erro ao carregar cursos em destaque."));
   }, []);
 
-  useEffect(() => {
-    // Fetch notícias
-    fetch("http://localhost:5000/api/notice")
-      .then((res) => res.json())
-      .then((data) => setNoticias(Array.isArray(data) ? data : []))
-      .catch(() => setError("Erro ao carregar notícias."));
-
-    // Fetch versículos
-    fetch("http://localhost:5000/api/bible")
-      .then((res) => res.json())
-      .then((data) => setVersiculos(Array.isArray(data) ? data : []))
-      .catch(() => setError("Erro ao carregar versículos."));
-  }, []);
-
   // Função de logout
   const handleLogout = () => {
     localStorage.removeItem("token");
